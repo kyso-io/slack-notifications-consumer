@@ -1,11 +1,11 @@
-import { KysoEvent, KysoTeamsAddMemberEvent, KysoTeamsRemoveMemberEvent, KysoTeamsUpdateMemberRolesEvent } from '@kyso-io/kyso-model'
+import { KysoEventEnum, KysoTeamsAddMemberEvent, KysoTeamsRemoveMemberEvent, KysoTeamsUpdateMemberRolesEvent } from '@kyso-io/kyso-model'
 import { Controller } from '@nestjs/common'
 import { EventPattern } from '@nestjs/microservices'
 import { sendMessageToSlackChannel } from '../helpers'
 
 @Controller()
 export class TeamsController {
-    @EventPattern(KysoEvent.TEAMS_ADD_MEMBER)
+    @EventPattern(KysoEventEnum.TEAMS_ADD_MEMBER)
     async handleTeamsAddMember(kysoTeamsAddMemberEvent: KysoTeamsAddMemberEvent) {
         const { organization, team, user, frontendUrl, roles } = kysoTeamsAddMemberEvent
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
@@ -15,7 +15,7 @@ export class TeamsController {
         sendMessageToSlackChannel(organization, team, text)
     }
 
-    @EventPattern(KysoEvent.TEAMS_UPDATE_MEMBER_ROLES)
+    @EventPattern(KysoEventEnum.TEAMS_UPDATE_MEMBER_ROLES)
     async handleTeamsUpdateMemberRoles(kysoTeamsUpdateMemberRolesEvent: KysoTeamsUpdateMemberRolesEvent) {
         const { organization, team, user, frontendUrl, previousRoles, currentRoles } = kysoTeamsUpdateMemberRolesEvent
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
@@ -25,7 +25,7 @@ export class TeamsController {
         sendMessageToSlackChannel(organization, team, text)
     }
 
-    @EventPattern(KysoEvent.TEAMS_REMOVE_MEMBER)
+    @EventPattern(KysoEventEnum.TEAMS_REMOVE_MEMBER)
     async handleTeamsRemoveMember(kysoTeamsRemoveMemberEvent: KysoTeamsRemoveMemberEvent) {
         const { organization, team, user, frontendUrl } = kysoTeamsRemoveMemberEvent
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`

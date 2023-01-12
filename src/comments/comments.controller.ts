@@ -1,11 +1,11 @@
-import { KysoCommentsCreateEvent, KysoCommentsDeleteEvent, KysoCommentsUpdateEvent, KysoEvent } from '@kyso-io/kyso-model'
+import { KysoCommentsCreateEvent, KysoCommentsDeleteEvent, KysoCommentsUpdateEvent, KysoEventEnum } from '@kyso-io/kyso-model'
 import { Controller } from '@nestjs/common'
 import { EventPattern } from '@nestjs/microservices'
 import { sendMessageToSlackChannel } from '../helpers'
 
 @Controller()
 export class CommentsController {
-    @EventPattern(KysoEvent.COMMENTS_CREATE)
+    @EventPattern(KysoEventEnum.COMMENTS_CREATE)
     async handleCommentsCreated(kysoCommentsCreateEvent: KysoCommentsCreateEvent) {
         const { organization, team, discussion, report, frontendUrl, user } = kysoCommentsCreateEvent
         if (discussion) {
@@ -18,8 +18,8 @@ export class CommentsController {
             sendMessageToSlackChannel(organization, team, text)
         }
     }
-    
-    @EventPattern(KysoEvent.COMMENTS_REPLY)
+
+    @EventPattern(KysoEventEnum.COMMENTS_REPLY)
     async handleCommentsReply(kysoCommentsCreateEvent: KysoCommentsCreateEvent) {
         const { organization, team, discussion, report, frontendUrl, user } = kysoCommentsCreateEvent
         if (discussion) {
@@ -33,7 +33,7 @@ export class CommentsController {
         }
     }
 
-    @EventPattern(KysoEvent.COMMENTS_UPDATE)
+    @EventPattern(KysoEventEnum.COMMENTS_UPDATE)
     async handleCommentsUpdated(kysoCommentsUpdateEvent: KysoCommentsUpdateEvent) {
         const { organization, team, discussion, report, frontendUrl, user } = kysoCommentsUpdateEvent
         if (discussion) {
@@ -47,7 +47,7 @@ export class CommentsController {
         }
     }
 
-    @EventPattern(KysoEvent.COMMENTS_DELETE)
+    @EventPattern(KysoEventEnum.COMMENTS_DELETE)
     async handleCommentsDeleted(kysoCommentsDeleteEvent: KysoCommentsDeleteEvent) {
         const { organization, team, discussion, report, frontendUrl, user } = kysoCommentsDeleteEvent
         if (discussion) {
