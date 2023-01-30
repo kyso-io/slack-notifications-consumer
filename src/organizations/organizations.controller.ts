@@ -1,4 +1,4 @@
-import { KysoEventEnum, KysoOrganizationsAddMemberEvent, KysoOrganizationsRemoveMemberEvent, KysoOrganizationsUpdateMemberRoleEvent } from '@kyso-io/kyso-model'
+import { KysoEventEnum, KysoOrganizationsAddMemberEvent, KysoOrganizationsDeleteEvent, KysoOrganizationsRemoveMemberEvent, KysoOrganizationsUpdateMemberRoleEvent } from '@kyso-io/kyso-model'
 import { Controller } from '@nestjs/common'
 import { EventPattern } from '@nestjs/microservices'
 import { sendMessageToSlackChannel } from '../helpers'
@@ -12,6 +12,7 @@ export class OrganizationsController {
         const text = `User *${user.name}* added to the organization <${organizationUrl}|${organization.display_name}> with the role *${role}*`
         sendMessageToSlackChannel(organization, null, text)
     }
+
     @EventPattern(KysoEventEnum.ORGANIZATIONS_UPDATE_MEMBER_ROLE)
     async handleOrganizationsUpdateMemberRole(kysoOrganizationsUpdateMemberRoleEvent: KysoOrganizationsUpdateMemberRoleEvent) {
         const { organization, user, frontendUrl, previousRole, currentRole } = kysoOrganizationsUpdateMemberRoleEvent
@@ -25,6 +26,13 @@ export class OrganizationsController {
         const { organization, user, frontendUrl } = kysoOrganizationsRemoveMemberEvent
         const organizationUrl = `${frontendUrl}/${organization.sluglified_name}`
         const text = `User *${user.name}* removed from the organization <${organizationUrl}|${organization.display_name}>`
+        sendMessageToSlackChannel(organization, null, text)
+    }
+
+    @EventPattern(KysoEventEnum.ORGANIZATIONS_DELETE)
+    async handleOrganizationsDelete(kysoOrganizationsDeleteEvent: KysoOrganizationsDeleteEvent) {
+        const { organization, user } = kysoOrganizationsDeleteEvent
+        const text = `Organization *${organization.display_name}* deleted by *${user.name}*`
         sendMessageToSlackChannel(organization, null, text)
     }
 }

@@ -1,4 +1,4 @@
-import { KysoEventEnum, KysoTeamsAddMemberEvent, KysoTeamsRemoveMemberEvent, KysoTeamsUpdateMemberRolesEvent } from '@kyso-io/kyso-model'
+import { KysoEventEnum, KysoTeamsAddMemberEvent, KysoTeamsCreateEvent, KysoTeamsDeleteEvent, KysoTeamsRemoveMemberEvent, KysoTeamsUpdateMemberRolesEvent } from '@kyso-io/kyso-model'
 import { Controller } from '@nestjs/common'
 import { EventPattern } from '@nestjs/microservices'
 import { sendMessageToSlackChannel } from '../helpers'
@@ -31,5 +31,20 @@ export class TeamsController {
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
         const text = `User *${user.name}* removed from the team <${teamUrl}|${team.display_name}>`
         sendMessageToSlackChannel(organization, team, text)
+    }
+
+    @EventPattern(KysoEventEnum.TEAMS_CREATE)
+    async handleTeamsCreate(kysoTeamsCreateEvent: KysoTeamsCreateEvent) {
+        const { user, organization, team, frontendUrl } = kysoTeamsCreateEvent
+        const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
+        const text = `User *${user.name}* created the team <${teamUrl}|${team.display_name}>`
+        sendMessageToSlackChannel(organization, null, text)
+    }
+
+    @EventPattern(KysoEventEnum.TEAMS_DELETE)
+    async handleTeamsDelete(kysoTeamsDeleteEvent: KysoTeamsDeleteEvent) {
+        const { user, organization, team } = kysoTeamsDeleteEvent
+        const text = `User *${user.name}* deleted the team *${team.display_name}*`
+        sendMessageToSlackChannel(organization, null, text)
     }
 }
