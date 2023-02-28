@@ -9,7 +9,7 @@ export class TeamsController {
     async handleTeamsAddMember(kysoTeamsAddMemberEvent: KysoTeamsAddMemberEvent) {
         const { organization, team, user, frontendUrl, roles } = kysoTeamsAddMemberEvent
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
-        const text = `User *${user.name}* added to the team <${teamUrl}|${team.display_name}> with the ${
+        const text = `User *${user.name}* added to the channel <${teamUrl}|${team.display_name}> with the ${
             roles.length > 1 ? `roles ${roles.map((role: string) => `*${role}*`).join(',')}` : `role *${roles[0]}*`
         }`
         sendMessageToSlackChannel(organization, team, text)
@@ -21,7 +21,7 @@ export class TeamsController {
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
         const text = `The roles of the User *${user.name}* have been updated from ${previousRoles.map((role: string) => `*${role}*`).join(',')} to ${currentRoles
             .map((role: string) => `*${role}*`)
-            .join(',')} in the <${teamUrl}|${team.display_name}> team`
+            .join(',')} in the <${teamUrl}|${team.display_name}> channel`
         sendMessageToSlackChannel(organization, team, text)
     }
 
@@ -29,7 +29,7 @@ export class TeamsController {
     async handleTeamsRemoveMember(kysoTeamsRemoveMemberEvent: KysoTeamsRemoveMemberEvent) {
         const { organization, team, user, frontendUrl } = kysoTeamsRemoveMemberEvent
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
-        const text = `User *${user.name}* removed from the team <${teamUrl}|${team.display_name}>`
+        const text = `User *${user.name}* removed from the channel <${teamUrl}|${team.display_name}>`
         sendMessageToSlackChannel(organization, team, text)
     }
 
@@ -37,14 +37,14 @@ export class TeamsController {
     async handleTeamsCreate(kysoTeamsCreateEvent: KysoTeamsCreateEvent) {
         const { user, organization, team, frontendUrl } = kysoTeamsCreateEvent
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
-        const text = `User *${user.name}* created the team <${teamUrl}|${team.display_name}>`
+        const text = `User *${user.name}* created the channel <${teamUrl}|${team.display_name}>`
         sendMessageToSlackChannel(organization, null, text)
     }
 
     @EventPattern(KysoEventEnum.TEAMS_DELETE)
     async handleTeamsDelete(kysoTeamsDeleteEvent: KysoTeamsDeleteEvent) {
         const { user, organization, team } = kysoTeamsDeleteEvent
-        const text = `User *${user.name}* deleted the team *${team.display_name}*`
+        const text = `User *${user.name}* deleted the channel *${team.display_name}*`
         sendMessageToSlackChannel(organization, null, text)
     }
 }
