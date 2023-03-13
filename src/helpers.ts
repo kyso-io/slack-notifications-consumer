@@ -1,4 +1,5 @@
 import { Organization, Team } from '@kyso-io/kyso-model'
+import { Logger } from '@nestjs/common'
 import axios, { AxiosResponse } from 'axios'
 
 export const sendMessageToSlackChannel = async (organization: Organization, team: Team, text: string): Promise<AxiosResponse<any>> => {
@@ -22,8 +23,14 @@ export const sendMessageToSlackChannel = async (organization: Organization, team
         {
             headers: {
                 Authorization: `Bearer ${organization.options.notifications.slackToken}`,
+                'Content-Type': 'application/json; charset=utf-8',
             },
         },
     )
+    if (!axiosResponse.data.ok) {
+        Logger.error(`An error occurred sending message to channel '${channel}'`, axiosResponse.data.error)
+    } else {
+        Logger.log(`Message sent to '${channel}' slack channel with slack_channel_id '${axiosResponse.data.channel}'`)
+    }
     return axiosResponse
 }
