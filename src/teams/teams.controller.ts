@@ -43,7 +43,10 @@ export class TeamsController {
 
     @EventPattern(KysoEventEnum.TEAMS_DELETE)
     async handleTeamsDelete(kysoTeamsDeleteEvent: KysoTeamsDeleteEvent) {
-        const { user, organization, team } = kysoTeamsDeleteEvent
+        const { user, organization, team, deletedOrganization } = kysoTeamsDeleteEvent
+        if (deletedOrganization) {
+            return
+        }
         const text = `User *${user.name}* deleted the channel *${team.display_name}*`
         sendMessageToSlackChannel(organization, null, text)
     }
