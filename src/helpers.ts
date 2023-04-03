@@ -34,3 +34,33 @@ export const sendMessageToSlackChannel = async (organization: Organization, team
     }
     return axiosResponse
 }
+
+export const organizationRoleToString = (role: string): string => {
+    switch (role) {
+        case 'organization-admin':
+            return 'Admin of this organization'
+        case 'team-admin':
+            return 'Full access all channels'
+        case 'team-contributor':
+            return 'Can edit all channels'
+        case 'team-reader':
+            return 'Can comment all channels'
+        default:
+            return role
+    }
+}
+
+export const teamRoleToString = (role: string): string => {
+    switch (role) {
+        case 'organization-admin':
+            return 'Full access'
+        case 'team-admin':
+            return 'Full access'
+        case 'team-contributor':
+            return 'Can edit'
+        case 'team-reader':
+            return 'Can comment'
+        default:
+            return role
+    }
+}

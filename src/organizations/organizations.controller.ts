@@ -1,7 +1,7 @@
 import { KysoEventEnum, KysoOrganizationsAddMemberEvent, KysoOrganizationsDeleteEvent, KysoOrganizationsRemoveMemberEvent, KysoOrganizationsUpdateMemberRoleEvent } from '@kyso-io/kyso-model'
 import { Controller } from '@nestjs/common'
 import { EventPattern } from '@nestjs/microservices'
-import { sendMessageToSlackChannel } from '../helpers'
+import { organizationRoleToString, sendMessageToSlackChannel } from '../helpers'
 
 @Controller()
 export class OrganizationsController {
@@ -9,7 +9,7 @@ export class OrganizationsController {
     async handleOrganizationsAddMember(kysoOrganizationsAddMemberEvent: KysoOrganizationsAddMemberEvent) {
         const { organization, user, frontendUrl, role } = kysoOrganizationsAddMemberEvent
         const organizationUrl = `${frontendUrl}/${organization.sluglified_name}`
-        const text = `User *${user.name}* added to the organization <${organizationUrl}|${organization.display_name}> with the role *${role}*`
+        const text = `User *${user.name}* added to the organization <${organizationUrl}|${organization.display_name}> with the role *${organizationRoleToString(role)}*`
         sendMessageToSlackChannel(organization, null, text)
     }
 
@@ -17,7 +17,9 @@ export class OrganizationsController {
     async handleOrganizationsUpdateMemberRole(kysoOrganizationsUpdateMemberRoleEvent: KysoOrganizationsUpdateMemberRoleEvent) {
         const { organization, user, frontendUrl, previousRole, currentRole } = kysoOrganizationsUpdateMemberRoleEvent
         const organizationUrl = `${frontendUrl}/${organization.sluglified_name}`
-        const text = `The role of the User *${user.name}* has been updated from *${previousRole}* to *${currentRole}* in the <${organizationUrl}|${organization.display_name}> organization`
+        const text = `The role of the User *${user.name}* has been updated from *${organizationRoleToString(previousRole)}* to *${organizationRoleToString(currentRole)}* in the <${organizationUrl}|${
+            organization.display_name
+        }> organization`
         sendMessageToSlackChannel(organization, null, text)
     }
 
