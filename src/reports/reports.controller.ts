@@ -1,10 +1,14 @@
-import { KysoEventEnum, KysoReportsCreateEvent, KysoReportsDeleteEvent, KysoReportsNewVersionEvent, KysoReportsPinEvent, KysoReportsStarEvent, KysoReportsUpdateEvent } from '@kyso-io/kyso-model'
-import { Controller } from '@nestjs/common'
+import { File, KysoEventEnum, KysoReportsCreateEvent, KysoReportsDeleteEvent, KysoReportsNewVersionEvent, KysoReportsPinEvent, KysoReportsStarEvent, KysoReportsUpdateEvent } from '@kyso-io/kyso-model'
+import { Controller, Inject } from '@nestjs/common'
 import { EventPattern } from '@nestjs/microservices'
+import { Db } from 'mongodb'
+import { Constants } from '../constants'
 import { sendMessageToSlackChannel } from '../helpers'
 
 @Controller()
 export class ReportsController {
+    constructor(@Inject(Constants.DATABASE_CONNECTION) private db: Db) {}
+
     @EventPattern(KysoEventEnum.REPORTS_CREATE)
     async handleReportsCreate(kysoReportsCreateEvent: KysoReportsCreateEvent) {
         const { organization, team, report, frontendUrl, user } = kysoReportsCreateEvent
@@ -18,6 +22,14 @@ export class ReportsController {
         const { organization, team, report, frontendUrl, user } = kysoReportsUpdateEvent
         const reportUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}/${report.sluglified_name}`
         const text = `User *${user.name}* updated report metadata <${reportUrl}|*${report.title}*>`
+        sendMessageToSlackChannel(organization, team, text)
+    }
+
+    @EventPattern(KysoEventEnum.REPORTS_UPDATED_MAIN_FILE)
+    async handleReportsUpdateMainFile(kysoReportsUpdateEvent: KysoReportsUpdateEvent) {
+        const { organization, team, report, frontendUrl, user } = kysoReportsUpdateEvent
+        const reportUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}/${report.sluglified_name}`
+        const text = `User *${user.name}* set as main the file *${report.main_file}* at report <${reportUrl}|*${report.title}*>`
         sendMessageToSlackChannel(organization, team, text)
     }
 
