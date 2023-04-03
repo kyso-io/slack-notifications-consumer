@@ -1,7 +1,7 @@
 import { KysoEventEnum, KysoTeamsAddMemberEvent, KysoTeamsCreateEvent, KysoTeamsDeleteEvent, KysoTeamsRemoveMemberEvent, KysoTeamsUpdateMemberRolesEvent } from '@kyso-io/kyso-model'
 import { Controller } from '@nestjs/common'
 import { EventPattern } from '@nestjs/microservices'
-import { sendMessageToSlackChannel } from '../helpers'
+import { sendMessageToSlackChannel, teamRoleToString } from '../helpers'
 
 @Controller()
 export class TeamsController {
@@ -10,7 +10,7 @@ export class TeamsController {
         const { organization, team, user, frontendUrl, roles } = kysoTeamsAddMemberEvent
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
         const text = `User *${user.name}* added to the channel <${teamUrl}|${team.display_name}> with the ${
-            roles.length > 1 ? `roles ${roles.map((role: string) => `*${role}*`).join(',')}` : `role *${roles[0]}*`
+            roles.length > 1 ? `roles ${roles.map((role: string) => `*${teamRoleToString(role)}*`).join(',')}` : `role *${teamRoleToString(roles[0])}*`
         }`
         sendMessageToSlackChannel(organization, team, text)
     }
@@ -19,8 +19,8 @@ export class TeamsController {
     async handleTeamsUpdateMemberRoles(kysoTeamsUpdateMemberRolesEvent: KysoTeamsUpdateMemberRolesEvent) {
         const { organization, team, user, frontendUrl, previousRoles, currentRoles } = kysoTeamsUpdateMemberRolesEvent
         const teamUrl = `${frontendUrl}/${organization.sluglified_name}/${team.sluglified_name}`
-        const text = `The roles of the User *${user.name}* have been updated from ${previousRoles.map((role: string) => `*${role}*`).join(',')} to ${currentRoles
-            .map((role: string) => `*${role}*`)
+        const text = `The role of the User *${user.name}* has been updated from ${previousRoles.map((role: string) => `*${teamRoleToString(role)}*`).join(', ')} to ${currentRoles
+            .map((role: string) => `*${teamRoleToString(role)}*`)
             .join(',')} in the <${teamUrl}|${team.display_name}> channel`
         sendMessageToSlackChannel(organization, team, text)
     }
