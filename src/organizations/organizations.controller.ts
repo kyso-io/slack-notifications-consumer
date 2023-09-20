@@ -7,9 +7,9 @@ import { organizationRoleToString, sendMessageToSlackChannel } from '../helpers'
 export class OrganizationsController {
     @EventPattern(KysoEventEnum.ORGANIZATIONS_ADD_MEMBER)
     async handleOrganizationsAddMember(kysoOrganizationsAddMemberEvent: KysoOrganizationsAddMemberEvent) {
-        const { organization, user, frontendUrl, role } = kysoOrganizationsAddMemberEvent
+        const { organization, userCreatingAction, frontendUrl, newRole } = kysoOrganizationsAddMemberEvent
         const organizationUrl = `${frontendUrl}/${organization.sluglified_name}`
-        const text = `User *${user.name}* added to the organization <${organizationUrl}|${organization.display_name}> with the role *${organizationRoleToString(role)}*`
+        const text = `User *${userCreatingAction.name}* added to the organization <${organizationUrl}|${organization.display_name}> with the role *${organizationRoleToString(newRole)}*`
         sendMessageToSlackChannel(organization, null, text)
     }
 
